@@ -45,6 +45,7 @@ map({ 'n', 'x', 'o' }, 'L', '$', opts)
 -- Navigate buffers
 map("n", "<A-.>", ":bnext<CR>", opts)
 map("n", "<A-,>", ":bprevious<CR>", opts)
+map("n", "<A-c>", ":bd<CR>", opts)
 
 -- Panes resizing
 map("n", "+", ":vertical resize +5<CR>")
@@ -56,13 +57,27 @@ map("n", "-", ":resize -5<CR>")
 map("n", "<CR>", "ciw", opts)
 map("n", "<BS>", 'ci', opts)
 
--- map ; to resume last search
+-- Map telescope
 map("n", ";;", "<cmd>lua require('telescope.builtin').resume(require('telescope.themes').get_dropdown({}))<cr>", opts)
 map("n", ";f", "<cmd>lua require('telescope.builtin').find_files()<cr>", opts)
 map("n", ";r", "<cmd>lua require('telescope.builtin').live_grep()<cr>", opts)
 map("n", "//", "<cmd>Telescope buffers<cr>", opts)
 
-map("n", "sf", "<cmd>NeoTreeFocusToggle<cr>", opts)
+-- Map ranger
+map("n", "sf", "<cmd>RnvimrToggle<cr>", opts)
+
+-- LSP
+map("n", "'f", "<cmd>lua vim.lsp.buf.format()<cr>", opts)
+map('n', '<C-j>', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
+map('n', '<C-J>', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
+
+-- Window navigation
+map("n", "sh", "<C-w>h", opts)
+map("n", "sk", "<C-w>k", opts)
+map("n", "sj", "<C-w>j", opts)
+map("n", "sl", "<C-w>l", opts)
+map("n", "ss", ":split<CR><C-w>w", opts)
+map("n", "sv", ":vsplit<CR><C-w>w", opts)
 
 vim.keymap.set('n', '<C-s>', function()
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
