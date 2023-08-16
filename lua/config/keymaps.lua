@@ -18,12 +18,12 @@ map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
 -- better indenting
-map("v", "<", "<gv")
-map("v", ">", ">gv")
+map("v", "<LEFT>", "<gv")
+map("v", "<RIGHT>", ">gv")
 
 -- paste over currently selected text without yanking it
-map("v", "p", '"_dp')
-map("v", "P", '"_dP')
+map("v", "p", '"_dP')
+map("v", "P", '"_dp')
 
 -- copy everything between { and } including the brackets
 -- p puts text after the cursor,
@@ -43,8 +43,8 @@ map({ 'n', 'x', 'o' }, 'H', '^', opts)
 map({ 'n', 'x', 'o' }, 'L', '$', opts)
 
 -- Navigate buffers
-map("n", "<Right>", ":bnext<CR>", opts)
-map("n", "<Left>", ":bprevious<CR>", opts)
+map("n", "<A-.>", ":bnext<CR>", opts)
+map("n", "<A-,>", ":bprevious<CR>", opts)
 
 -- Panes resizing
 map("n", "+", ":vertical resize +5<CR>")
@@ -57,7 +57,12 @@ map("n", "<CR>", "ciw", opts)
 map("n", "<BS>", 'ci', opts)
 
 -- map ; to resume last search
-map("n", ";", "<cmd>lua require('telescope.builtin').resume(require('telescope.themes').get_dropdown({}))<cr>", opts)
+map("n", ";;", "<cmd>lua require('telescope.builtin').resume(require('telescope.themes').get_dropdown({}))<cr>", opts)
+map("n", ";f", "<cmd>lua require('telescope.builtin').find_files()<cr>", opts)
+map("n", ";r", "<cmd>lua require('telescope.builtin').live_grep()<cr>", opts)
+map("n", "//", "<cmd>Telescope buffers<cr>", opts)
+
+map("n", "sf", "<cmd>NeoTreeFocusToggle<cr>", opts)
 
 vim.keymap.set('n', '<C-s>', function()
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
