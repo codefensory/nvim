@@ -1,9 +1,9 @@
 return {
     "jose-elias-alvarez/null-ls.nvim",
-    lazy = false,
+    config = function()
+        -- Here is the formatting config
+        local null_ls = require("null-ls")
 
-    opts = function(_, opts)
-        -- table.insert(opts.sources, require("typescript.extensions.null-ls.code-actions"))
-    end,
-    -- TODO
+        require("null-ls").setup()
+    end
 }
