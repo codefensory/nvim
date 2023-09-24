@@ -1,5 +1,7 @@
+--[[
 return {
   {
+    enable = false,
     'VonHeikemen/lsp-zero.nvim',
     branch = 'v2.x',
     lazy = true,
@@ -15,6 +17,7 @@ return {
 
   -- Autocompletion
   {
+    enable = false,
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
     dependencies = {
@@ -349,12 +352,13 @@ return {
 
       lspconfig.tsserver.setup({
         root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json"),
-        filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte' },
+        filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', "typescript.tsx", 'vue', 'svelte' },
         cmd = { "typescript-language-server", "--stdio" },
       })
 
       lspconfig.eslint.setup({
-        filestypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte' },
+        filestypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'typescript.tsx', 'vue',
+          'svelte' },
         settings = {
           workingDirectory = { mode = 'auto' },
           format = { enable = true },
@@ -434,3 +438,4 @@ return {
     end
   }
 }
+--]]

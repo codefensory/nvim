@@ -54,7 +54,6 @@ map("n", "=", ":resize +5<CR>")
 map("n", "-", ":resize -5<CR>")
 
 -- Map enter to ciw in normal mode
-map("n", "<CR>", "ciw", opts)
 map("n", "<BS>", 'ci', opts)
 
 -- Map telescope
@@ -66,10 +65,35 @@ map("n", "//", "<cmd>Telescope buffers<cr>", opts)
 -- Map ranger
 map("n", "sf", "<cmd>RnvimrToggle<cr>", opts)
 
--- LSP
-map("n", "'f", "<cmd>lua vim.lsp.buf.format()<cr>", opts)
-map('n', '<C-j>', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
-map('n', '<C-J>', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
+-- COC
+vim.cmd([[
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+]])
+
+map("n", "gd", "<Plug>(coc-definition)", opts)
+map("n", "gy", "<Plug>(coc-type-definition)", opts)
+map("n", "gi", "<Plug>(coc-implementation)", opts)
+map("n", "gr", "<Plug>(coc-references)", opts)
+
+function _G.show_docs()
+  local cw = vim.fn.expand('<cword>')
+  if vim.fn.index({ 'vim', 'help' }, vim.bo.filetype) >= 0 then
+    vim.api.nvim_command('h ' .. cw)
+  elseif vim.api.nvim_eval('coc#rpc#ready()') then
+    vim.fn.CocActionAsync('doHover')
+  else
+    vim.api.nvim_command('!' .. vim.o.keywordprg .. ' ' .. cw)
+  end
+end
+
+map('n', 'K', '<CMD>lua _G.show_docs()<CR>', opts)
+
+map("n", "'f", "<Plug>(coc-format)", opts)
+map('n', '<C-j>', '<Plug>(coc-diagnostic-next)', opts)
+map('n', '<C-J>', '<Plug>(coc-diagnostic-prev)', opts)
 
 -- Window navigation
 map("n", "sh", "<C-w>h", opts)

@@ -4,6 +4,6 @@ return {
         -- Here is the formatting config
         local null_ls = require("null-ls")
 
-        require("null-ls").setup()
+        null_ls.setup()
     end
 }
