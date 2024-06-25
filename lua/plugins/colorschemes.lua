@@ -1,11 +1,12 @@
 return {
   {
     "catppuccin/nvim",
-    enabled = true,
-    priority = 150,
+    enabled = false,
+    priority = 1000,
     name = "catppuccin",
     config = function()
       require("catppuccin").setup({
+        term_colors = true,
         background = {
           light = "latte",
           dark = "mocha",
@@ -64,18 +65,18 @@ return {
             CursorLineNr = { fg = colors.surface2 },
             Pmenu = { bg = colors.crust, fg = "" },
             PmenuSel = { bg = colors.surface0, fg = "" },
-            -- TelescopeSelection = { bg = colors.surface0 },
-            -- TelescopePromptCounter = { fg = colors.mauve },
-            -- TelescopePromptPrefix = { bg = colors.surface0 },
-            -- TelescopePromptNormal = { bg = colors.surface0 },
-            -- TelescopeResultsNormal = { bg = colors.mantle },
-            -- TelescopePreviewNormal = { bg = colors.crust },
-            -- TelescopePromptBorder = { bg = colors.surface0, fg = colors.surface0 },
-            -- TelescopeResultsBorder = { bg = colors.mantle, fg = colors.mantle },
-            -- TelescopePreviewBorder = { bg = colors.crust, fg = colors.crust },
-            -- TelescopePromptTitle = { fg = colors.surface0, bg = colors.surface0 },
-            -- TelescopeResultsTitle = { fg = colors.mantle, bg = colors.mantle },
-            -- TelescopePreviewTitle = { fg = colors.crust, bg = colors.crust },
+            TelescopeSelection = { bg = colors.surface0 },
+            TelescopePromptCounter = { fg = colors.mauve },
+            TelescopePromptPrefix = { bg = colors.surface0 },
+            TelescopePromptNormal = { bg = colors.surface0 },
+            TelescopeResultsNormal = { bg = colors.mantle },
+            TelescopePreviewNormal = { bg = colors.crust },
+            TelescopePromptBorder = { bg = colors.surface0, fg = colors.surface0 },
+            TelescopeResultsBorder = { bg = colors.mantle, fg = colors.mantle },
+            TelescopePreviewBorder = { bg = colors.crust, fg = colors.crust },
+            TelescopePromptTitle = { fg = colors.surface0, bg = colors.surface0 },
+            TelescopeResultsTitle = { fg = colors.mantle, bg = colors.mantle },
+            TelescopePreviewTitle = { fg = colors.crust, bg = colors.crust },
             IndentBlanklineChar = { fg = colors.surface0 },
             IndentBlanklineContextChar = { fg = colors.surface2 },
             GitSignsChange = { fg = colors.peach },
@@ -88,12 +89,12 @@ return {
         end,
       })
 
-      -- vim.api.nvim_command("colorscheme catppuccin")
+      vim.api.nvim_command("colorscheme catppuccin")
     end,
   },
   {
     'sainnhe/gruvbox-material',
-    enabled = true,
+    enabled = false,
     priority = 1000,
     config = function()
       vim.o.background = "dark"
@@ -102,4 +103,108 @@ return {
       vim.cmd.colorscheme 'gruvbox-material'
     end,
   },
+  {
+    'rebelot/kanagawa.nvim',
+    enabled = false,
+    priority = 1000,
+    config = function()
+      vim.o.background = ""
+
+      vim.cmd.colorscheme 'kanagawa-dragon'
+    end
+  },
+  {
+    "xero/miasma.nvim",
+    enabled = false,
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd("colorscheme miasma")
+    end,
+  },
+  {
+    "tiagovla/tokyodark.nvim",
+    enabled = false,
+    opts = {
+      -- custom options here
+    },
+    config = function(_, opts)
+      require("tokyodark").setup(opts) -- calling setup is optional
+      vim.cmd [[colorscheme tokyodark]]
+    end,
+  },
+  {
+    'navarasu/onedark.nvim',
+    enabled = false,
+    priority = 1000,
+    lazy = false,
+
+    config = function()
+      require('onedark').setup {
+        style = 'warm',
+      }
+      require('onedark').load()
+    end,
+  },
+  {
+    "neanias/everforest-nvim",
+    enabled = true,
+    version = false,
+    lazy = false,
+    priority = 1000, -- make sure to load this before all the other start plugins
+    -- Optional; default configuration will be used if setup isn't called.
+    config = function()
+      require("everforest").setup({
+        on_highlights = function(hl, palette)
+          local c1 = palette.bg1
+          local c2 = palette.bg2
+          local c3 = palette.bg1
+          local c4 = palette.bg3
+
+          hl.TelescopeSelection = { bg = c4 }
+          hl.TelescopePromptCounter = { fg = palette.fg }
+          hl.TelescopePromptPrefix = { bg = c1 }
+          hl.TelescopePromptNormal = { bg = c1 }
+          hl.TelescopeResultsNormal = { bg = c2 }
+          hl.TelescopePreviewNormal = { bg = c3 }
+          hl.TelescopePromptBorder = { bg = c1, fg = c1 }
+          hl.TelescopeResultsBorder = { bg = c2, fg = c2 }
+          hl.TelescopePreviewBorder = { bg = c3, fg = c3 }
+          hl.TelescopePromptTitle = { fg = c1, bg = c1 }
+          hl.TelescopeResultsTitle = { fg = c2, bg = c2 }
+          hl.TelescopePreviewTitle = { fg = c3, bg = c3 }
+
+          hl.Directory = { fg = palette.fg, bg = palette.none }
+          hl.Fg = { fg = palette.fg }
+        end,
+
+        colours_override = function(palette)
+          if vim.o.background == "light" then
+            palette.fg = "#7e8186"
+            palette.bg_dim = "#f7f7f7"
+            palette.bg0 = "#ffffff"
+            palette.bg1 = "#f0f0f0"
+            palette.bg2 = "#e8e8e8"
+            palette.bg3 = "#dadada"
+            palette.bg4 = "#cccccc"
+            palette.bg5 = "#bbbbbb"
+            palette.bg_visual = "#e0e0e0"
+            palette.bg_red = "#ffe7de"
+            palette.bg_green = "#f3f5d9"
+            palette.bg_blue = "#ecf5ed"
+            palette.bg_yellow = "#fef2d5"
+          else
+            local bg_dim = palette.bg_dim
+
+            palette.bg_dim = palette.bg0
+            palette.bg0 = bg_dim
+
+            palette.fg = "#a7abb4"
+          end
+        end
+      })
+
+      require("everforest").load()
+    end
+  }
 }

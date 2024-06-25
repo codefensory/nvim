@@ -54,7 +54,6 @@ map("n", "=", ":resize +5<CR>")
 map("n", "-", ":resize -5<CR>")
 
 -- Map enter to ciw in normal mode
-map("n", "<CR>", "ciw", opts)
 map("n", "<BS>", 'ci', opts)
 
 -- Map telescope
@@ -67,7 +66,7 @@ map("n", "//", "<cmd>Telescope buffers<cr>", opts)
 map("n", "sf", "<cmd>RnvimrToggle<cr>", opts)
 
 -- LSP
-map("n", "'f", "<cmd>lua vim.lsp.buf.format()<cr>", opts)
+--map("n", "'f", "<cmd>lua vim.lsp.buf.format({async = true})<cr>", opts)
 map('n', '<C-j>', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
 map('n', '<C-J>', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
 

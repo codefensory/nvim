@@ -1,16 +1,19 @@
 return {
   {
     'VonHeikemen/lsp-zero.nvim',
-    branch = 'v2.x',
+    branch = 'v3.x',
     lazy = true,
-    config = function()
-      -- This is where you modify the settings for lsp-zero
-      -- Note: autocompletion settings will not take effect
-
-      require('lsp-zero.settings').preset({
-        name = 'recommended',
-      })
-    end
+    config = false,
+    init = function()
+      -- Disable automatic setup, we are doing it manually
+      vim.g.lsp_zero_extend_cmp = 0
+      vim.g.lsp_zero_extend_lspconfig = 0
+    end,
+  },
+  {
+    'williamboman/mason.nvim',
+    lazy = false,
+    config = true,
   },
 
   -- Autocompletion
@@ -170,29 +173,6 @@ return {
               end
             end,
           },
-          ["<Tab>"] = cmp_mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            elseif utils.jumpable(1) then
-              luasnip.jump(1)
-            elseif utils.has_words_before() then
-              -- cmp.complete()
-              fallback()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp_mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
           ["<C-Space>"] = cmp_mapping.complete(),
           ["<C-e>"] = cmp_mapping.abort(),
           ["<CR>"] = cmp_mapping(function(fallback)
@@ -232,12 +212,6 @@ return {
     dependencies = {
       { 'hrsh7th/cmp-nvim-lsp' },
       { 'williamboman/mason-lspconfig.nvim' },
-      {
-        'williamboman/mason.nvim',
-        build = function()
-          pcall(vim.cmd, 'MasonUpdate')
-        end,
-      },
       { 'b0o/schemastore.nvim' }
     },
     config = function()
@@ -245,31 +219,55 @@ return {
 
       local lsp = require('lsp-zero')
 
-      lsp.ensure_installed({
-        'tsserver',
-        'eslint',
-        'rust_analyzer',
-        'lua_ls',
-        'jsonls',
-        'bashls',
-        'vimls',
-        -- 'nomic_solidity'
-      })
-
       lsp.on_attach(function(client, bufnr)
         lsp.default_keymaps({ buffer = bufnr })
         vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { buffer = true })
+        vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', { buffer = true })
       end)
 
-      lsp.skip_server_setup({ 'rust_analyzer' })
-
-      lsp.set_server_config({
-        on_init = function(client)
-          client.server_capabilities.semanticTokensProvider = nil
-        end,
+      require('mason-lspconfig').setup({
+        ensure_installed = { 'rust_analyzer', 'jsonls', 'bashls', 'vimls' },
+        handlers = {
+          lsp.default_setup,
+          tsserver = function()
+            local lspconfig = require('lspconfig')
+            lspconfig.tsserver.setup({
+              root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json"),
+              filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte' },
+              cmd = { "typescript-language-server", "--stdio" },
+            })
+          end,
+          eslint = function()
+            local lspconfig = require('lspconfig')
+            lspconfig.eslint.setup({
+              filestypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte' },
+              settings = {
+                workingDirectory = { mode = 'auto' },
+                format = { enable = true },
+                lint = { enable = true },
+              },
+            })
+          end,
+          lua_ls = function()
+            local lspconfig = require('lspconfig')
+            lspconfig.lua_ls.setup({
+              settings = {
+                Lua = {
+                  diagnostics = {
+                    globals = { "vim", "custom_nvim" },
+                  },
+                  workspace = {
+                    library = vim.api.nvim_get_runtime_file("", true),
+                    checkThirdParty = false,
+                    hint = { enable = true },
+                    telemetry = { enable = false },
+                  },
+                },
+              },
+            })
+          end
+        }
       })
-
-      lsp.nvim_workspace()
 
       lsp.format_on_save({
         format_opts = {
@@ -281,25 +279,14 @@ return {
           ['rust_analyzer'] = { 'rust' },
           -- if you have a working setup with null-ls
           -- you can specify filetypes it can format.
-          -- ['null-ls'] = { 'javascript', 'typescript' },
+          --['null-ls'] = { 'javascript', 'typescript' },
         }
-      })
-
-      lsp.set_preferences({
-        suggest_lsp_servers = false,
-      })
-
-      lsp.set_sign_icons({
-        error = "E",
-        warn = "W",
-        hint = "H",
-        info = "I",
       })
 
       vim.diagnostic.config({
         title            = false,
         underline        = true,
-        virtual_text     = false,
+        virtual_text     = true,
         signs            = true,
         update_in_insert = false,
         severity_sort    = true,
@@ -311,86 +298,6 @@ return {
           prefix = "",
         },
       })
-
-      local lspconfig = require('lspconfig')
-      lspconfig.lua_ls.setup({
-        settings = {
-          Lua = {
-            diagnostics = {
-              globals = { "vim", "custom_nvim" },
-            },
-            workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
-              checkThirdParty = false,
-              hint = { enable = true },
-              telemetry = { enable = false },
-            },
-          },
-        },
-      })
-
-      lspconfig.solidity.setup({
-        cmd = { "nomicfoundation-solidity-language-server", "--stdio" },
-        filetypes = { "solidity", "sol" },
-        root_dir = require("lspconfig.util").find_git_ancestor,
-        single_file_support = true,
-      })
-
-      lspconfig.jsonls.setup({
-        settings = {
-          json = {
-            schema = require('schemastore').json.schemas(),
-            validate = { enable = true },
-          }
-        }
-      })
-
-      lspconfig.tsserver.setup({
-        root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json"),
-        filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte' },
-        cmd = { "typescript-language-server", "--stdio" },
-      })
-
-      lspconfig.eslint.setup({
-        filestypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte' },
-        settings = {
-          workingDirectory = { mode = 'auto' },
-          format = { enable = true },
-          lint = { enable = true },
-        },
-      })
-
-      lspconfig.rust_analyzer.setup({
-        settings = {
-          ["rust-analyzer"] = {
-            lens = {
-              enable = true,
-            },
-            cargo = {
-              allFeatures = true,
-              loadOutDirsFromCheck = true,
-              runBuildScripts = true,
-            },
-            -- Add clippy lints for Rust.
-            check = {
-              enable = true,
-              allFeatures = true,
-              command = "clippy",
-              extraArgs = { "--no-deps" },
-            },
-            procMacro = {
-              enable = true,
-              ignored = {
-                ["async-trait"] = { "async_trait" },
-                ["napi-derive"] = { "napi" },
-                ["async-recursion"] = { "async_recursion" },
-              },
-            },
-          },
-        },
-      })
-
-      lsp.setup()
     end
   }
 }
